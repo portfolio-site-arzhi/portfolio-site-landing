@@ -1,0 +1,6 @@
+import { fetchLandingPortfolioDetailFromBackend } from '../../../utils/landingPortfolios'
+
+export default defineEventHandler(async (event) => {
+  const slug = getRouterParam(event, 'slug') || ''
+  return await fetchLandingPortfolioDetailFromBackend(event, slug)
+})

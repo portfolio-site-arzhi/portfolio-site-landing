@@ -1,0 +1,8 @@
+.output
+.nuxt
+node_modules
+npm-debug.log
+dist
+.git
+.DS_Store
+

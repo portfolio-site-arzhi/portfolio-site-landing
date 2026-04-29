@@ -1,0 +1,22 @@
+name: portfolio_site_landing_preprod
+
+services:
+  portfolio_site_landing:
+    container_name: portfolio_site_landing_preprod
+    restart: "always"
+    networks:
+      - global_portfolio_site_network_preprod
+
+  portfolio_site_landing_nginx:
+    container_name: portfolio_site_landing_nginx_preprod
+    restart: "always"
+    ports:
+      - "3200:80"
+    volumes:
+      - ./docker/nginx/default.preprod.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - global_portfolio_site_network_preprod
+
+networks:
+  global_portfolio_site_network_preprod:
+    external: true

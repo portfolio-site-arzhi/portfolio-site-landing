@@ -1,0 +1,19 @@
+services:
+  portfolio_site_landing:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      PORT: 3000
+      NUXT_PUBLIC_BACKEND_URL: ${NUXT_PUBLIC_BACKEND_URL_DOCKER}
+      TZ: ${TZ}
+    expose:
+      - "3000"
+
+  portfolio_site_landing_nginx:
+    image: nginx:1.27-alpine
+    depends_on:
+      - portfolio_site_landing
+    volumes:
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
