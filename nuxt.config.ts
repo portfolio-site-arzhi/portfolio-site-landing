@@ -10,6 +10,12 @@ export default defineNuxtConfig({
   app: {
     head: {
       link: [
+        {
+          key: 'site-favicon',
+          rel: 'icon',
+          type: 'image/png',
+          href: '/logo.png'
+        },
         ...(isDevRun
           ? [
               {
