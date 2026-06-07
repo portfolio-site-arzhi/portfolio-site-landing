@@ -11,7 +11,7 @@
 
               <div class="text-body-1 text-medium-emphasis mb-2">
                 <span v-if="statusCode">{{ statusCode }}</span>
-                <span v-if="statusText">— {{ statusText }}</span>
+                <span v-if="statusText"> - {{ statusText }}</span>
               </div>
 
               <div class="text-body-2 mb-6">
@@ -35,24 +35,21 @@
 </template>
 
 <script setup lang="ts">
-type ErrorLike = {
-  statusCode?: number;
-  statusMessage?: string;
-  message?: string;
-}
+import type { NuxtError } from '#app'
+import { resolveErrorHomePath, resolveErrorRetryPath } from './utils/errorNavigation'
 
-const route = useRoute()
+const requestUrl = useRequestURL()
 const error = useError()
 const { t, locale } = useI18n()
-const localePath = useLocalePath()
+const currentError = computed(() => error.value as NuxtError | null)
 
 const statusCode = computed(() => {
-  const value = (error.value as ErrorLike | null)?.statusCode
+  const value = currentError.value?.statusCode
   return typeof value === 'number' ? value : undefined
 })
 
 const statusText = computed(() => {
-  const err = error.value as ErrorLike | null
+  const err = currentError.value
   const raw = err?.statusMessage || err?.message
   const text = typeof raw === 'string' ? raw.trim() : ''
   return text.length > 0 ? text : undefined
@@ -70,11 +67,16 @@ useHead(() => ({
 }))
 
 const handleHome = () => {
-  clearError({ redirect: localePath('/') })
+  clearError({ redirect: resolveErrorHomePath(requestUrl.pathname) })
 }
 
 const handleRetry = () => {
-  clearError({ redirect: route.fullPath })
+  clearError({
+    redirect: resolveErrorRetryPath(
+      requestUrl.pathname,
+      requestUrl.search,
+      requestUrl.hash
+    )
+  })
 }
 </script>
-

@@ -1,34 +1,12 @@
 import type { H3Event } from 'h3'
 import type { LandingPortfolioDetailResponse, LandingPortfolioDto, LandingPortfoliosResponse } from '../../app/models/LandingPortfolio'
 import { sanitizeLocalizedTextOrStringServer } from '../../app/utils/sanitizeHtml'
-
-const getBackendUrl = (event: H3Event): string | undefined => {
-  const config = useRuntimeConfig(event)
-  const backendUrl = String(config.public.backendUrl || '').trim()
-  return backendUrl || undefined
-}
+import { fetchFromBackend, getBackendUrl, resolveBackendAssetUrl } from './backendConfig'
 
 const getFetchErrorStatusCode = (error: unknown): number | undefined => {
   if (typeof error !== 'object' || error === null || !('response' in error)) return undefined
   const response = (error as { response?: { status?: unknown } }).response
   return typeof response?.status === 'number' ? response.status : undefined
-}
-
-const resolveBackendAssetUrl = (
-  value: string | null | undefined,
-  backendUrl: string
-): string | null | undefined => {
-  if (typeof value !== 'string') return value
-
-  const trimmed = value.trim()
-  if (!trimmed) return null
-  if (/^https?:\/\//i.test(trimmed)) return trimmed
-
-  try {
-    return new URL(trimmed, backendUrl).toString()
-  } catch {
-    return trimmed
-  }
 }
 
 const sanitizeLandingPortfolioDto = async (
@@ -50,8 +28,7 @@ export const fetchLandingPortfoliosFromBackend = async (
   if (!backendUrl) return { data: [] }
 
   try {
-    const url = new URL('/landing/portfolios', backendUrl).toString()
-    const res = await $fetch<LandingPortfoliosResponse>(url)
+    const res = await fetchFromBackend<LandingPortfoliosResponse>(backendUrl, '/landing/portfolios')
     const data = Array.isArray(res?.data)
       ? await Promise.all(res.data.map(async (item) => await sanitizeLandingPortfolioDto(item, backendUrl)))
       : []
@@ -70,8 +47,7 @@ export const fetchLandingPortfolioDetailFromBackend = async (
   if (!backendUrl || !slug) return { data: null }
 
   try {
-    const url = new URL(`/landing/portfolios/${slug}`, backendUrl).toString()
-    const res = await $fetch<LandingPortfolioDetailResponse>(url)
+    const res = await fetchFromBackend<LandingPortfolioDetailResponse>(backendUrl, `/landing/portfolios/${slug}`)
 
     if (!res?.data) return { data: null }
 

@@ -5,15 +5,12 @@ import { resolveFailHardOnBackendError } from '../utils/backendFailure'
 import { mapLandingSkillsToViewModel } from '../utils/landingSkillsMapper'
 
 const fetchLandingSkills = async (
-  backendUrl: string | undefined,
   failHardOnBackendError: boolean
 ): Promise<LandingSkillsResponse | null> => {
-  if (!backendUrl) return null
   try {
-    const url = new URL('/landing/skills', backendUrl).toString()
-    return await $fetch<LandingSkillsResponse>(url)
+    return await $fetch<LandingSkillsResponse>('/api/landing/skills')
   } catch {
-    if (import.meta.server && failHardOnBackendError && backendUrl) {
+    if (import.meta.server && failHardOnBackendError) {
       throw createError({ statusCode: 503, statusMessage: 'Service Unavailable' })
     }
     return null
@@ -22,7 +19,6 @@ const fetchLandingSkills = async (
 
 export const useLandingSkills = () => {
   const runtimeConfig = useRuntimeConfig()
-  const backendUrl = String(runtimeConfig.public.backendUrl || '').trim() || undefined
   const failHardOnBackendError = resolveFailHardOnBackendError(
     runtimeConfig.public.failHardOnBackendError,
     !import.meta.dev
@@ -32,7 +28,7 @@ export const useLandingSkills = () => {
 
   const { data, pending, error, refresh } = useAsyncData<LandingSkillsResponse | null>(
     'landing-skills',
-    async () => await fetchLandingSkills(backendUrl, failHardOnBackendError),
+    async () => await fetchLandingSkills(failHardOnBackendError),
     {
       server: true,
       getCachedData: getCachedDataFromPayload,
@@ -40,7 +36,7 @@ export const useLandingSkills = () => {
     }
   )
 
-  const hasBackendError = computed(() => Boolean(backendUrl) && !pending.value && data.value === null)
+  const hasBackendError = computed(() => !pending.value && data.value === null)
 
   const skillGroups = computed<SkillGroup[]>(() => {
     const fromApi = data.value?.data

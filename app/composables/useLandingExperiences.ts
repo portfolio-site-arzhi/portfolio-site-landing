@@ -2,38 +2,15 @@ import type { Experience } from '../models/Experience'
 import type { LandingExperiencesResponse } from '../models/LandingExperience'
 import { getCachedDataFromPayload } from '../utils/asyncDataCache'
 import { resolveFailHardOnBackendError } from '../utils/backendFailure'
-import { sanitizeExperienceHtmlServer } from '../utils/experienceHtml'
 import { mapLandingExperiencesToViewModel } from '../utils/landingExperiencesMapper'
 
 const fetchLandingExperiences = async (
-  backendUrl: string | undefined,
   failHardOnBackendError: boolean
 ): Promise<LandingExperiencesResponse | null> => {
-  if (!backendUrl) return null
   try {
-    const url = new URL('/landing/experiences', backendUrl).toString()
-    const res = await $fetch<LandingExperiencesResponse>(url)
-    if (!res?.data?.length) return res ?? null
-
-    if (import.meta.client) return res
-
-    const sanitized = await Promise.all(
-      res.data.map(async (dto) => {
-        const desc = dto.description
-        if (!desc) return dto
-        return {
-          ...dto,
-          description: {
-            id: await sanitizeExperienceHtmlServer(desc.id ?? ''),
-            en: await sanitizeExperienceHtmlServer(desc.en ?? '')
-          }
-        }
-      })
-    )
-
-    return { data: sanitized }
+    return await $fetch<LandingExperiencesResponse>('/api/landing/experiences')
   } catch {
-    if (import.meta.server && failHardOnBackendError && backendUrl) {
+    if (import.meta.server && failHardOnBackendError) {
       throw createError({ statusCode: 503, statusMessage: 'Service Unavailable' })
     }
     return null
@@ -42,7 +19,6 @@ const fetchLandingExperiences = async (
 
 export const useLandingExperiences = () => {
   const runtimeConfig = useRuntimeConfig()
-  const backendUrl = String(runtimeConfig.public.backendUrl || '').trim() || undefined
   const failHardOnBackendError = resolveFailHardOnBackendError(
     runtimeConfig.public.failHardOnBackendError,
     !import.meta.dev
@@ -52,7 +28,7 @@ export const useLandingExperiences = () => {
 
   const { data, pending, error, refresh } = useAsyncData<LandingExperiencesResponse | null>(
     'landing-experiences',
-    async () => await fetchLandingExperiences(backendUrl, failHardOnBackendError),
+    async () => await fetchLandingExperiences(failHardOnBackendError),
     {
       server: true,
       getCachedData: getCachedDataFromPayload,
@@ -60,7 +36,7 @@ export const useLandingExperiences = () => {
     }
   )
 
-  const hasBackendError = computed(() => Boolean(backendUrl) && !pending.value && data.value === null)
+  const hasBackendError = computed(() => !pending.value && data.value === null)
 
   const experiences = computed<Experience[]>(() => {
     const fromApi = data.value?.data
