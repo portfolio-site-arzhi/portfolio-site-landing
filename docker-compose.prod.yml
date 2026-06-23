@@ -2,14 +2,8 @@ services:
   portfolio_site_landing:
     container_name: portfolio_site_landing
     restart: "always"
-    networks:
-      - global_portfolio_site_network
-
-  portfolio_site_landing_nginx:
-    container_name: portfolio_site_landing_nginx
-    restart: "always"
     ports:
-      - "3000:80"
+      - "127.0.0.1:3000:3000"
     networks:
       - global_portfolio_site_network
 

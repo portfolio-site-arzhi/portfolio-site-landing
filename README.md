@@ -9,7 +9,7 @@ Landing page portfolio berbasis Nuxt 4 dengan dukungan SSR, i18n, dan UI Vuetify
 - Vuetify (`vuetify-nuxt-module`)
 - `@nuxtjs/i18n`
 - Vitest (`unit` dan `e2e`)
-- Docker + Nginx
+- Docker + reverse proxy host
 
 ## Prasyarat
 
@@ -61,6 +61,9 @@ npm run test:run
 
 ## Menjalankan Dengan Docker
 
+Repo ini sekarang hanya mempertahankan jalur container untuk `local/default` dan `production`.
+Reverse proxy `nginx` diasumsikan berada di host/server, bukan di dalam Docker Compose project ini.
+
 1. Pastikan external network tersedia:
 
 ```bash
@@ -77,12 +80,18 @@ docker compose up --build -d
 ```
 
 4. Akses aplikasi di `http://localhost:3000`.
+   Default compose langsung mengekspos container Nuxt ke host pada `127.0.0.1:3000`, jadi cocok jika reverse proxy `nginx` sudah ada di host/server.
+
+Untuk production, gunakan override berikut:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d
+```
 
 5. Cek log jika diperlukan:
 
 ```bash
 docker compose logs -f portfolio_site_landing
-docker compose logs -f portfolio_site_landing_nginx
 ```
 
 ## Troubleshooting
