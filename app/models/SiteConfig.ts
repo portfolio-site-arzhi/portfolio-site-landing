@@ -17,6 +17,7 @@ export interface SiteConfigHome {
 export interface SiteConfigAbout {
   about_me?: LocalizedText;
   email?: string | null;
+  whatsapp?: string | null;
 }
 
 export interface SiteConfigFooter {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { buildSocialLinks, pickLocalizedText, resolveThemeColors } from '../../app/utils/siteConfig'
+import { buildSocialLinks, buildWhatsAppUrl, pickLocalizedText, resolveThemeColors } from '../../app/utils/siteConfig'
 
 describe('siteConfig utils', () => {
   it('pickLocalizedText should pick direct locale value', () => {
@@ -35,7 +35,7 @@ describe('siteConfig utils', () => {
         linkedin: 'https://linkedin.com/in/new',
         instagram: 'https://instagram.com/new'
       },
-      about: { email: 'new@example.com' },
+      about: { email: 'new@example.com', whatsapp: '8121234567' },
       fallback
     })
 
@@ -43,8 +43,24 @@ describe('siteConfig utils', () => {
       { platform: 'GitHub', url: 'https://github.com/new', icon: 'mdi-github' },
       { platform: 'LinkedIn', url: 'https://linkedin.com/in/new', icon: 'mdi-linkedin' },
       { platform: 'Email', url: 'mailto:new@example.com', icon: 'mdi-email' },
+      { platform: 'WhatsApp', url: 'https://wa.me/628121234567', icon: 'mdi-whatsapp' },
       { platform: 'Instagram', url: 'https://instagram.com/new', icon: 'mdi-instagram' }
     ])
+  })
+
+  it('buildWhatsAppUrl should only create links for valid configured numbers', () => {
+    expect(buildWhatsAppUrl(' 8121234567 ')).toBe('https://wa.me/628121234567')
+    expect(buildWhatsAppUrl('08121234567')).toBeUndefined()
+    expect(buildWhatsAppUrl('628121234567')).toBeUndefined()
+    expect(buildWhatsAppUrl(undefined)).toBeUndefined()
+  })
+
+  it('buildSocialLinks should hide WhatsApp when the number is absent or invalid', () => {
+    expect(buildSocialLinks({
+      footer: null,
+      about: { whatsapp: '08121234567' },
+      fallback: []
+    })).toEqual([])
   })
 
   it('resolveThemeColors should use defaults when system is null', () => {

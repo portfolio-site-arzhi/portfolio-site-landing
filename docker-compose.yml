@@ -1,12 +1,16 @@
 services:
   portfolio_site_landing:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile
+    image: ${PORTFOLIO_SITE_LANDING_IMAGE:-portfolio-site-landing:local}
     environment:
-      NODE_ENV: ${NODE_ENV}
+      NODE_ENV: ${NODE_ENV:-production}
       PORT: 3000
-      NUXT_PUBLIC_BACKEND_URL: ${NUXT_PUBLIC_BACKEND_URL_DOCKER}
-      TZ: ${TZ}
+      NUXT_PUBLIC_BACKEND_URL: ${NUXT_PUBLIC_BACKEND_URL:-}
+      TZ: ${TZ:-Asia/Jakarta}
     expose:
       - "3000"
+    networks:
+      - global_portfolio_site_network
+
+networks:
+  global_portfolio_site_network:
+    external: true

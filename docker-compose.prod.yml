@@ -1,12 +1,10 @@
 services:
   portfolio_site_landing:
+    image: ${PORTFOLIO_SITE_LANDING_IMAGE:?PORTFOLIO_SITE_LANDING_IMAGE is required in production}
     container_name: portfolio_site_landing
-    restart: "always"
+    restart: always
+    environment:
+      NODE_ENV: production
+      NUXT_PUBLIC_BACKEND_URL: ${NUXT_PUBLIC_BACKEND_URL:?NUXT_PUBLIC_BACKEND_URL is required in production}
     ports:
       - "127.0.0.1:3000:3000"
-    networks:
-      - global_portfolio_site_network
-
-networks:
-  global_portfolio_site_network:
-    external: true

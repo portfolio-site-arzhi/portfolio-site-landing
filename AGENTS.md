@@ -1,5 +1,8 @@
 # Rules Workspace (ringkas & operasional)
 
+## File rules
+- Jangan membuat, menghapus, atau mengubah file aturan (`AGENTS.md`, `rules.md`, dan seluruh file dalam folder `rules/`) kecuali user meminta secara eksplisit.
+
 ## Referensi & dokumentasi
 - Selalu gunakan Context7 saat membutuhkan pembuatan kode, langkah setup/konfigurasi, atau dokumentasi library/API (resolve Library ID lalu ambil dokumentasi otomatis).
 - Selalu gunakan Nuxt MCP saat membutuhkan pembuatan kode, langkah setup/konfigurasi, atau dokumentasi library/API.
@@ -24,6 +27,11 @@
 - Tampilan harus responsif di berbagai ukuran layar dan enak dilihat.
 - Pastikan aplikasi SEO-friendly.
 - Pastikan tidak ada error atau warning di console browser.
+
+## Taste dan Ritme UI
+- Untuk perubahan visual, audit dahulu brand, layout, dan pola yang sudah ada; jangan mengubah struktur informasi, navigasi, atau copy tanpa permintaan eksplisit user.
+- Utamakan hierarki, spacing yang konsisten, serta state responsif dan aksesibel untuk fokus, helper text, dan error form.
+- Hindari pola visual generik atau dekorasi yang tidak mendukung konten; perubahan desain harus memiliki alasan yang jelas dan tetap selaras dengan identitas landing yang ada.
 
 ## Struktur folder project
 ```

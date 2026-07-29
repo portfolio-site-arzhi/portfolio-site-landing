@@ -17,6 +17,15 @@ export const pickLocalizedText = (value: LocalizedText | undefined, locale: stri
   return undefined
 }
 
+export const buildWhatsAppUrl = (value: string | null | undefined): string | undefined => {
+  if (typeof value !== 'string') return undefined
+
+  const whatsapp = value.trim()
+  if (!/^8[0-9]{8,11}$/.test(whatsapp)) return undefined
+
+  return `https://wa.me/62${whatsapp}`
+}
+
 export const buildSocialLinks = (input: {
   footer: SiteConfigFooter | null | undefined;
   about: SiteConfigAbout | null | undefined;
@@ -30,11 +39,13 @@ export const buildSocialLinks = (input: {
   const email = input.about?.email
     ? `mailto:${input.about.email}`
     : byPlatform.get('Email')?.url
+  const whatsapp = buildWhatsAppUrl(input.about?.whatsapp)
 
   const next: SocialLink[] = []
   if (github) next.push({ platform: 'GitHub', url: github, icon: 'mdi-github' })
   if (linkedin) next.push({ platform: 'LinkedIn', url: linkedin, icon: 'mdi-linkedin' })
   if (email) next.push({ platform: 'Email', url: email, icon: 'mdi-email' })
+  if (whatsapp) next.push({ platform: 'WhatsApp', url: whatsapp, icon: 'mdi-whatsapp' })
 
   const instagram = input.footer?.instagram
   if (instagram) next.push({ platform: 'Instagram', url: instagram, icon: 'mdi-instagram' })

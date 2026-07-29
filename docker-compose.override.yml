@@ -2,11 +2,10 @@ services:
   portfolio_site_landing:
     container_name: portfolio_site_landing
     restart: "no"
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    environment:
+      NUXT_PUBLIC_BACKEND_URL: ${NUXT_PUBLIC_BACKEND_URL_DOCKER:-}
     ports:
       - "127.0.0.1:3000:3000"
-    networks:
-      - global_portfolio_site_network
-
-networks:
-  global_portfolio_site_network:
-    external: true

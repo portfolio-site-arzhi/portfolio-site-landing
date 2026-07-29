@@ -3,6 +3,16 @@
 node_modules
 npm-debug.log
 dist
+.env
+.env.*
+.envrc
+.gitignore
 .git
 .DS_Store
+coverage
+README.md
+docker-compose*.yml
+.dockerignore
+sample
+tests
 
