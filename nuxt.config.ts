@@ -13,8 +13,8 @@ export default defineNuxtConfig({
         {
           key: 'site-favicon',
           rel: 'icon',
-          type: 'image/png',
-          href: '/logo.png'
+          type: 'image/x-icon',
+          href: '/favicon.ico?v=bf68864d'
         },
         ...(isDevRun
           ? [
