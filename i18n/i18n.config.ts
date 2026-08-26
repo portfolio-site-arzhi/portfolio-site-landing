@@ -20,6 +20,20 @@ export default defineI18nConfig(() => {
         home: {
           hello: 'Halo, saya'
         },
+        a11y: {
+          skipToContent: 'Lewati ke konten utama',
+          openNavigation: 'Buka navigasi',
+          closeNavigation: 'Tutup navigasi',
+          primaryNavigation: 'Navigasi utama',
+          changeLanguage: 'Ubah bahasa'
+        },
+        states: {
+          loading: 'Memuat konten',
+          emptyExperience: 'Belum ada pengalaman yang dapat ditampilkan.',
+          emptyEducation: 'Belum ada pendidikan yang dapat ditampilkan.',
+          emptyCertifications: 'Belum ada sertifikasi yang dapat ditampilkan.',
+          emptyPortfolio: 'Belum ada proyek yang dapat ditampilkan.'
+        },
         experience: {
           heading: 'Pengalaman'
         },
@@ -67,6 +81,20 @@ export default defineI18nConfig(() => {
         },
         home: {
           hello: "Hello, I'm"
+        },
+        a11y: {
+          skipToContent: 'Skip to main content',
+          openNavigation: 'Open navigation',
+          closeNavigation: 'Close navigation',
+          primaryNavigation: 'Primary navigation',
+          changeLanguage: 'Change language'
+        },
+        states: {
+          loading: 'Loading content',
+          emptyExperience: 'No experience is available yet.',
+          emptyEducation: 'No education is available yet.',
+          emptyCertifications: 'No certifications are available yet.',
+          emptyPortfolio: 'No projects are available yet.'
         },
         experience: {
           heading: 'Experience'

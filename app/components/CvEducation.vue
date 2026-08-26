@@ -1,43 +1,36 @@
 <template>
-  <v-card class="pa-6 motion-lift" elevation="2">
-    <v-card-title class="text-h5 font-weight-bold mb-4">{{ t('nav.education') }}</v-card-title>
-
-    <v-list lines="three">
-      <v-list-item
-        v-for="(item, index) in items"
-        :key="item.id"
-        class="motion-in"
-        :style="{ '--enter-delay': `${index * 36}ms` }"
-      >
-        <template #title>
-          <div class="d-flex flex-wrap align-center justify-space-between gap-2">
-            <div class="text-subtitle-1 font-weight-medium">{{ item.institution }}</div>
-            <div class="text-caption text-medium-emphasis">{{ item.period }}</div>
+  <EditorialRecordList>
+    <article
+      v-for="(item, index) in items"
+      :key="item.id"
+      class="editorial-record education-record"
+    >
+      <RevealOnView :delay="Math.min(index * 45, 180)">
+        <div class="education-record__inner">
+          <div class="education-record__meta">
+            <p>{{ item.period }}</p>
+            <p v-if="item.location">{{ item.location }}</p>
           </div>
-        </template>
 
-        <template #subtitle>
-          <div class="text-body-2">{{ item.program }}<span v-if="item.location"> • {{ item.location }}</span></div>
-          <v-expand-transition>
-            <div v-if="item.description || item.highlights?.length" class="mt-2">
-              <div v-if="item.description" class="education-description" v-html="item.description" />
-              <ul v-if="item.highlights?.length" class="pl-4">
-                <li v-for="h in item.highlights" :key="h" class="text-body-2">
-                  {{ h }}
-                </li>
-              </ul>
-            </div>
-          </v-expand-transition>
-        </template>
-      </v-list-item>
-    </v-list>
-  </v-card>
+          <div class="education-record__body">
+            <h2>{{ item.institution }}</h2>
+            <p class="education-record__program">{{ item.program }}</p>
+            <!-- eslint-disable-next-line vue/no-v-html -->
+            <div v-if="item.description" class="editorial-rich-text education-record__description" v-html="item.description" />
+            <ul v-if="item.highlights?.length" class="education-record__highlights">
+              <li v-for="highlight in item.highlights" :key="highlight">
+                {{ highlight }}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </RevealOnView>
+    </article>
+  </EditorialRecordList>
 </template>
 
 <script setup lang="ts">
 import type { Education } from '../models/Education'
-
-const { t } = useI18n()
 
 defineProps<{
   items: Education[]
@@ -45,19 +38,65 @@ defineProps<{
 </script>
 
 <style scoped>
-.education-description :deep(p) {
-  margin: 0 0 12px;
+.education-record {
+  padding-block: clamp(32px, 5vw, 62px);
 }
 
-.education-description :deep(ul),
-.education-description :deep(ol) {
-  margin: 0 0 12px;
-  padding-left: 1.25rem;
+.education-record__inner {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.34fr) minmax(0, 1fr);
+  gap: clamp(28px, 6vw, 92px);
 }
 
-.education-description :deep(p:last-child),
-.education-description :deep(ul:last-child),
-.education-description :deep(ol:last-child) {
-  margin-bottom: 0;
+.education-record__meta p {
+  margin: 0;
+  color: var(--editorial-muted);
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+.education-record__meta p:first-child {
+  color: var(--editorial-accent);
+  font-weight: 680;
+}
+
+.education-record__body h2 {
+  max-width: 22ch;
+  margin: 0;
+  font-size: clamp(1.55rem, 3vw, 3rem);
+  font-variation-settings: 'wght' 635;
+  letter-spacing: -0.045em;
+  line-height: 1.06;
+}
+
+.education-record__program {
+  margin: 12px 0 0;
+  color: var(--editorial-muted);
+  font-size: 1rem;
+  font-weight: 550;
+}
+
+.education-record__description {
+  max-width: 72ch;
+  margin-top: 26px;
+}
+
+.education-record__highlights {
+  max-width: 68ch;
+  padding-left: 1.2rem;
+  margin: 24px 0 0;
+  color: var(--editorial-muted);
+  line-height: 1.65;
+}
+
+.education-record__highlights li + li {
+  margin-top: 8px;
+}
+
+@media (max-width: 679px) {
+  .education-record__inner {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
 }
 </style>
