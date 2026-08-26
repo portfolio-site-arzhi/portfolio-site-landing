@@ -1,14 +1,16 @@
 <template>
-  <v-container>
-    <div class="d-flex align-center justify-space-between flex-wrap gap-2 mb-6">
+  <v-container class="editorial-shell editorial-page portfolio-detail">
+    <nav class="portfolio-detail__toolbar" :aria-label="t('nav.portfolio')">
       <v-btn :to="localePath('/portfolio')" variant="text" prepend-icon="mdi-arrow-left">
         {{ t('nav.portfolio') }}
       </v-btn>
-      <div v-if="project" class="d-flex align-center gap-2">
+
+      <div v-if="project" class="portfolio-detail__external-links">
         <v-btn
           v-if="project.github"
           :href="project.github"
           target="_blank"
+          rel="noopener noreferrer"
           variant="text"
           prepend-icon="mdi-github"
         >
@@ -18,16 +20,17 @@
           v-if="project.link"
           :href="project.link"
           target="_blank"
+          rel="noopener noreferrer"
           color="primary"
-          variant="tonal"
+          variant="flat"
           append-icon="mdi-open-in-new"
         >
           {{ t('project.live') }}
         </v-btn>
       </div>
-    </div>
+    </nav>
 
-    <v-alert v-if="shouldShowInlineBackendAlert" type="warning" variant="tonal" border="start" class="mb-6">
+    <v-alert v-if="shouldShowInlineBackendAlert" type="warning" variant="tonal" border="start" class="editorial-alert mb-8">
       <div class="d-flex align-center justify-space-between flex-wrap ga-3">
         <div>{{ t('errors.backendUnavailable') }}</div>
         <v-btn size="small" variant="outlined" :loading="pending" @click="refresh()">
@@ -37,64 +40,64 @@
     </v-alert>
 
     <template v-if="project">
-      <v-fade-transition appear>
-        <div>
-          <h1 class="text-h3 font-weight-bold mb-2">{{ project.title }}</h1>
-          <p class="text-body-1 text-grey-darken-1 mb-6">
-            {{ project.description }}
-          </p>
-        </div>
-      </v-fade-transition>
+      <PageIntro
+        :title="project.title"
+        :description="project.description"
+        :eyebrow="project.role || t('project.title')"
+      />
 
-      <v-row>
-        <v-col cols="12" md="7">
-          <v-card elevation="2" class="mb-6 portfolio-hero-card">
-            <img
-              :src="resolvePortfolioImage(project.image)"
-              :alt="project.title"
-              loading="eager"
-              fetchpriority="high"
-              decoding="async"
-              class="portfolio-hero-image"
-            >
-          </v-card>
+      <RevealOnView>
+        <figure class="portfolio-detail__hero">
+          <img
+            :src="resolvePortfolioImage(project.image)"
+            :alt="project.title"
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+            class="portfolio-hero-image"
+            @error="applyPortfolioImageFallback"
+          >
+        </figure>
+      </RevealOnView>
 
-          <v-card v-if="project.contribution" elevation="2" class="pa-6 mb-6">
-            <div class="text-h6 font-weight-bold mb-3">{{ t('project.contributions') }}</div>
-            <!-- eslint-disable-next-line vue/no-v-html -->
-            <div class="portfolio-rich-text" v-html="project.contribution" />
-          </v-card>
-
-          <v-card v-if="project.outcome" elevation="2" class="pa-6">
-            <div class="text-h6 font-weight-bold mb-3">{{ t('project.outcomes') }}</div>
-            <!-- eslint-disable-next-line vue/no-v-html -->
-            <div class="portfolio-rich-text" v-html="project.outcome" />
-          </v-card>
-        </v-col>
-
-        <v-col cols="12" md="5">
-          <v-card elevation="2" class="pa-6 mb-6">
-            <div class="text-h6 font-weight-bold mb-3">{{ t('project.role') }}</div>
-            <div class="text-body-1">{{ project.role || '-' }}</div>
-
-            <v-divider class="my-4" />
-
-            <div class="text-h6 font-weight-bold mb-3">{{ t('project.stack') }}</div>
+      <div class="portfolio-detail__case-study">
+        <aside class="portfolio-detail__metadata">
+          <dl>
             <div>
-              <v-chip
-                v-for="tech in project.stack"
-                :key="tech"
-                size="small"
-                class="mr-2 mb-2"
-                color="primary"
-                variant="tonal"
-              >
-                {{ tech }}
-              </v-chip>
+              <dt>{{ t('project.role') }}</dt>
+              <dd>{{ project.role || '-' }}</dd>
             </div>
-          </v-card>
-        </v-col>
-      </v-row>
+            <div>
+              <dt>{{ t('project.stack') }}</dt>
+              <dd>
+                <ul class="portfolio-detail__stack">
+                  <li v-for="tech in project.stack" :key="tech">
+                    {{ tech }}
+                  </li>
+                </ul>
+              </dd>
+            </div>
+          </dl>
+        </aside>
+
+        <div class="portfolio-detail__narrative">
+          <RevealOnView v-if="project.contribution">
+            <section class="portfolio-detail__section">
+              <h2>{{ t('project.contributions') }}</h2>
+              <!-- eslint-disable-next-line vue/no-v-html -->
+              <div class="editorial-rich-text portfolio-rich-text" v-html="project.contribution" />
+            </section>
+          </RevealOnView>
+
+          <RevealOnView v-if="project.outcome" :delay="70">
+            <section class="portfolio-detail__section">
+              <h2>{{ t('project.outcomes') }}</h2>
+              <!-- eslint-disable-next-line vue/no-v-html -->
+              <div class="editorial-rich-text portfolio-rich-text" v-html="project.outcome" />
+            </section>
+          </RevealOnView>
+        </div>
+      </div>
     </template>
   </v-container>
 </template>
@@ -102,7 +105,7 @@
 <script setup lang="ts">
 import { useLandingPortfolioDetail } from '../../composables/useLandingPortfolios'
 import { resolveFailHardOnBackendError } from '../../utils/backendFailure'
-import { resolvePortfolioImage } from '../../utils/portfolioImage'
+import { applyPortfolioImageFallback, resolvePortfolioImage } from '../../utils/portfolioImage'
 
 const route = useRoute()
 const { t, locale } = useI18n()
@@ -152,35 +155,134 @@ useHead(() => ({
 </script>
 
 <style scoped>
-.portfolio-hero-card {
+.portfolio-detail__toolbar {
+  display: flex;
+  margin-bottom: clamp(44px, 7vw, 90px);
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.portfolio-detail__external-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.portfolio-detail__hero {
+  aspect-ratio: 16 / 9;
+  margin: 0;
   overflow: hidden;
-  border-radius: 24px;
+  border: 1px solid var(--editorial-line);
+  border-radius: var(--editorial-radius-large);
+  background: #e4e9ed;
 }
 
 .portfolio-hero-image {
-  width: 100%;
-  height: clamp(280px, 62vw, 380px);
-  object-fit: cover;
   display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-.portfolio-rich-text :deep(p) {
-  margin: 0 0 12px;
+.portfolio-detail__case-study {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.34fr) minmax(0, 1fr);
+  gap: clamp(48px, 9vw, 144px);
+  padding-top: clamp(64px, 10vw, 144px);
 }
 
-.portfolio-rich-text :deep(ul),
-.portfolio-rich-text :deep(ol) {
+.portfolio-detail__metadata {
+  align-self: start;
+}
+
+.portfolio-detail__metadata dl {
+  position: sticky;
+  top: calc(var(--app-bar-fallback) + 36px);
   margin: 0;
-  padding-left: 1.25rem;
+  border-top: 1px solid var(--editorial-line-strong);
 }
 
-.portfolio-rich-text :deep(li) {
+.portfolio-detail__metadata dl > div {
+  padding-block: 20px;
+  border-bottom: 1px solid var(--editorial-line);
+}
+
+.portfolio-detail__metadata dt {
   margin-bottom: 8px;
+  color: var(--editorial-faint);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
 }
 
-@media (min-width: 960px) {
-  .portfolio-hero-image {
-    height: clamp(420px, 40vw, 540px);
+.portfolio-detail__metadata dd {
+  margin: 0;
+  color: var(--editorial-muted);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.portfolio-detail__stack {
+  display: flex;
+  padding: 0;
+  margin: 0;
+  flex-wrap: wrap;
+  gap: 7px;
+  list-style: none;
+}
+
+.portfolio-detail__stack li {
+  padding: 5px 8px;
+  border: 1px solid var(--editorial-line);
+  border-radius: 7px;
+  font-size: 0.76rem;
+}
+
+.portfolio-detail__narrative {
+  border-top: 1px solid var(--editorial-line-strong);
+}
+
+.portfolio-detail__section {
+  padding-block: clamp(38px, 6vw, 76px);
+  border-bottom: 1px solid var(--editorial-line);
+}
+
+.portfolio-detail__section h2 {
+  max-width: 18ch;
+  margin: 0 0 28px;
+  font-size: clamp(1.55rem, 3vw, 3rem);
+  font-variation-settings: 'wght' 635;
+  letter-spacing: -0.045em;
+  line-height: 1.06;
+}
+
+.portfolio-rich-text {
+  max-width: 72ch;
+}
+
+@media (max-width: 799px) {
+  .portfolio-detail__toolbar {
+    align-items: flex-start;
+  }
+
+  .portfolio-detail__case-study {
+    grid-template-columns: 1fr;
+  }
+
+  .portfolio-detail__metadata dl {
+    position: static;
+  }
+}
+
+@media (max-width: 599px) {
+  .portfolio-detail__toolbar {
+    flex-direction: column;
+  }
+
+  .portfolio-detail__external-links {
+    width: 100%;
   }
 }
 </style>

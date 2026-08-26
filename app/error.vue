@@ -1,34 +1,31 @@
 <template>
   <v-app>
-    <v-main class="bg-grey-lighten-4">
-      <v-container class="py-12">
-        <v-row justify="center">
-          <v-col cols="12" md="8">
-            <v-card class="pa-6" elevation="2">
-              <div class="text-h4 font-weight-bold mb-2">
-                {{ t('errors.errorTitle') }}
-              </div>
+    <v-main class="site-main error-page">
+      <v-container class="editorial-shell error-page__inner">
+        <section class="error-page__content">
+          <p v-if="statusCode" class="error-page__code" aria-hidden="true">
+            {{ statusCode }}
+          </p>
 
-              <div class="text-body-1 text-medium-emphasis mb-2">
-                <span v-if="statusCode">{{ statusCode }}</span>
-                <span v-if="statusText"> - {{ statusText }}</span>
-              </div>
+          <div>
+            <p class="editorial-kicker">{{ statusText || t('errors.errorTitle') }}</p>
+            <h1 class="editorial-title error-page__title">
+              {{ t('errors.errorTitle') }}
+            </h1>
+            <p class="editorial-lede error-page__description">
+              {{ t('errors.errorDescription') }}
+            </p>
 
-              <div class="text-body-2 mb-6">
-                {{ t('errors.errorDescription') }}
-              </div>
-
-              <div class="d-flex flex-wrap ga-3">
-                <v-btn color="primary" @click="handleRetry">
-                  {{ t('errors.retry') }}
-                </v-btn>
-                <v-btn variant="outlined" @click="handleHome">
-                  {{ t('errors.backHome') }}
-                </v-btn>
-              </div>
-            </v-card>
-          </v-col>
-        </v-row>
+            <div class="editorial-actions error-page__actions">
+              <v-btn color="primary" size="large" @click="handleRetry">
+                {{ t('errors.retry') }}
+              </v-btn>
+              <v-btn variant="outlined" size="large" @click="handleHome">
+                {{ t('errors.backHome') }}
+              </v-btn>
+            </div>
+          </div>
+        </section>
       </v-container>
     </v-main>
   </v-app>
@@ -80,3 +77,57 @@ const handleRetry = () => {
   })
 }
 </script>
+
+<style scoped>
+.error-page {
+  min-height: 100svh;
+}
+
+.error-page__inner {
+  display: flex;
+  min-height: 100svh;
+  align-items: center;
+}
+
+.error-page__content {
+  display: grid;
+  width: 100%;
+  grid-template-columns: minmax(220px, 0.48fr) minmax(0, 0.82fr);
+  gap: clamp(44px, 8vw, 128px);
+  align-items: end;
+  padding-block: 64px;
+  border-top: 1px solid var(--editorial-line-strong);
+  border-bottom: 1px solid var(--editorial-line);
+}
+
+.error-page__code {
+  margin: 0;
+  color: rgba(var(--v-theme-primary), 0.18);
+  font-size: clamp(7rem, 20vw, 18rem);
+  font-variation-settings: 'wght' 720;
+  letter-spacing: -0.1em;
+  line-height: 0.7;
+}
+
+.error-page__title {
+  margin-top: 20px;
+}
+
+.error-page__description {
+  margin-top: 28px;
+}
+
+.error-page__actions {
+  margin-top: 34px;
+}
+
+@media (max-width: 759px) {
+  .error-page__content {
+    grid-template-columns: 1fr;
+  }
+
+  .error-page__code {
+    font-size: clamp(6rem, 34vw, 10rem);
+  }
+}
+</style>

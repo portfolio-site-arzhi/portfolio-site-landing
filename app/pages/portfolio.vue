@@ -2,13 +2,13 @@
   <div>
     <NuxtPage v-if="isDetail" />
 
-    <v-container v-else>
-      <h1 class="text-h3 font-weight-bold mb-8 text-center">{{ t('portfolio.title') }}</h1>
-      <p class="text-body-2 text-medium-emphasis mb-6 text-center">
-        {{ t('portfolio.description') }}
-      </p>
+    <v-container v-else class="editorial-shell editorial-page portfolio-page">
+      <PageIntro
+        :title="t('portfolio.title')"
+        :description="t('portfolio.description')"
+      />
 
-      <v-alert v-if="shouldShowInlineBackendAlert" type="warning" variant="tonal" border="start" class="mb-6">
+      <v-alert v-if="shouldShowInlineBackendAlert" type="warning" variant="tonal" border="start" class="editorial-alert mb-8">
         <div class="d-flex align-center justify-space-between flex-wrap ga-3">
           <div>{{ t('errors.backendUnavailable') }}</div>
           <v-btn size="small" variant="outlined" :loading="pending" @click="refresh()">
@@ -17,70 +17,21 @@
         </div>
       </v-alert>
 
-      <v-row>
-        <v-col
-          v-for="(project, index) in projects"
-          :key="project.id"
-          cols="12"
-          md="4"
-          class="motion-in"
-          :style="{ '--enter-delay': `${index * 40}ms` }"
-        >
-          <v-card
-            elevation="2"
-            class="d-flex flex-column h-100 transition-swing motion-lift"
-            role="link"
-            tabindex="0"
-            @click="navigateTo(`/portfolio/${project.slug}`)"
-            @keydown.enter.prevent="navigateTo(`/portfolio/${project.slug}`)"
-            @keydown.space.prevent="navigateTo(`/portfolio/${project.slug}`)"
-          >
-            <img
-              :src="resolvePortfolioImage(project.image)"
-              :alt="project.title"
-              :loading="index < 3 ? 'eager' : 'lazy'"
-              :fetchpriority="index === 0 ? 'high' : 'auto'"
-              decoding="async"
-              style="width: 100%; height: 200px; object-fit: cover; display: block;"
-            >
-
-              <v-card-title>{{ project.title }}</v-card-title>
-
-              <v-card-text class="flex-grow-1">
-                <p class="mb-0 line-clamp-2">{{ project.description }}</p>
-              </v-card-text>
-
-              <v-card-actions class="d-flex ga-2 portfolio-actions">
-                <v-btn
-                  color="primary"
-                  variant="tonal"
-                  @click.stop="navigateTo(`/portfolio/${project.slug}`)"
-                >
-                  {{ t('portfolio.details') }}
-                </v-btn>
-                <v-spacer />
-                <v-btn
-                  v-if="project.github"
-                  :href="project.github"
-                  target="_blank"
-                  icon="mdi-github"
-                  variant="text"
-                  @click.stop
-                />
-                <v-btn
-                  v-if="project.link"
-                  :href="project.link"
-                  target="_blank"
-                  color="primary"
-                  variant="text"
-                  @click.stop
-                >
-                  {{ t('project.live') }}
-                </v-btn>
-              </v-card-actions>
-          </v-card>
-        </v-col>
-      </v-row>
+      <ContentState
+        :pending="pending && projects.length === 0"
+        :empty="!pending && projects.length === 0"
+        :loading-text="t('states.loading')"
+        :empty-text="t('states.emptyPortfolio')"
+      >
+        <HydratedPortfolioShowcase
+          :projects="projects"
+          :base-path="localePath('/portfolio')"
+          :details-label="t('portfolio.details')"
+          :github-label="t('project.github')"
+          :live-label="t('project.live')"
+          :stack-label="t('project.stack')"
+        />
+      </ContentState>
     </v-container>
   </div>
 </template>
@@ -88,11 +39,16 @@
 <script setup lang="ts">
 import { useLandingPortfolios } from '../composables/useLandingPortfolios'
 import { resolveFailHardOnBackendError } from '../utils/backendFailure'
-import { resolvePortfolioImage } from '../utils/portfolioImage'
+
+const HydratedPortfolioShowcase = defineLazyHydrationComponent(
+  'visible',
+  () => import('../components/PortfolioShowcase.vue')
+)
 
 const { projects, hasBackendError, pending, refresh } = useLandingPortfolios()
 const route = useRoute()
 const { t, locale } = useI18n()
+const localePath = useLocalePath()
 const runtimeConfig = useRuntimeConfig()
 
 const isDetail = computed(() => {
@@ -137,10 +93,3 @@ useHead(() => {
   }
 })
 </script>
-
-<style scoped>
-.portfolio-actions {
-  min-height: 64px;
-  align-items: center;
-}
-</style>

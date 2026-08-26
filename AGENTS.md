@@ -30,8 +30,13 @@
 
 ## Taste dan Ritme UI
 - Untuk perubahan visual, audit dahulu brand, layout, dan pola yang sudah ada; jangan mengubah struktur informasi, navigasi, atau copy tanpa permintaan eksplisit user.
+- Wajib gunakan skill `design-taste-frontend` untuk perubahan substansial pada layout, typography, visual hierarchy, atau motion. Skill ini tidak diperlukan untuk task logic, data-only, atau perubahan visual kecil yang sepenuhnya mengikuti pola yang sudah ada.
+- Terapkan prinsip taste skill secara kontekstual. Contoh React atau Tailwind di dalam skill tidak menggantikan stack utama project ini: Nuxt, Vue, dan Vuetify.
 - Utamakan hierarki, spacing yang konsisten, serta state responsif dan aksesibel untuk fokus, helper text, dan error form.
 - Hindari pola visual generik atau dekorasi yang tidak mendukung konten; perubahan desain harus memiliki alasan yang jelas dan tetap selaras dengan identitas landing yang ada.
+- Motion harus memiliki fungsi storytelling, hierarchy, feedback, atau state transition. Gunakan CSS dan IntersectionObserver untuk motion umum yang ringan.
+- GSAP hanya boleh digunakan untuk sequence scroll yang benar-benar membutuhkan scrub atau choreography. GSAP wajib di-lazy-load hanya di client, memiliki cleanup, menyediakan fallback responsif, dan menghormati `prefers-reduced-motion`.
+- Dilarang memakai scroll hijacking, custom cursor, WebGL, autoplay video berukuran besar, animasi dekoratif tanpa tujuan, atau mengubah information architecture dan copy tanpa permintaan eksplisit user.
 
 ## Struktur folder project
 ```

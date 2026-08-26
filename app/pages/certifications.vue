@@ -1,8 +1,8 @@
 <template>
-  <v-container>
-    <h1 class="text-h3 font-weight-bold mb-8 text-center">{{ t('nav.certifications') }}</h1>
+  <v-container class="editorial-shell editorial-page">
+    <PageIntro :title="t('nav.certifications')" />
 
-    <v-alert v-if="shouldShowInlineBackendAlert" type="warning" variant="tonal" border="start" class="mb-6">
+    <v-alert v-if="shouldShowInlineBackendAlert" type="warning" variant="tonal" border="start" class="editorial-alert mb-8">
       <div class="d-flex align-center justify-space-between flex-wrap ga-3">
         <div>{{ t('errors.backendUnavailable') }}</div>
         <v-btn size="small" variant="outlined" :loading="pending" @click="refresh()">
@@ -11,11 +11,14 @@
       </div>
     </v-alert>
 
-    <v-row justify="center">
-      <v-col cols="12" md="10">
-        <CvCertifications :items="certifications" />
-      </v-col>
-    </v-row>
+    <ContentState
+      :pending="pending && certifications.length === 0"
+      :empty="!pending && certifications.length === 0"
+      :loading-text="t('states.loading')"
+      :empty-text="t('states.emptyCertifications')"
+    >
+      <CvCertifications :items="certifications" />
+    </ContentState>
   </v-container>
 </template>
 

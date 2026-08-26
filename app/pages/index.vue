@@ -1,55 +1,59 @@
 <template>
-  <v-container class="fill-height">
-    <v-row align="center" justify="center">
-      <v-col cols="12" md="6" class="text-center text-md-left">
-        <v-fade-transition appear>
-          <div>
-            <h1 class="text-h4 text-sm-h3 text-md-h2 font-weight-bold mb-4 text-break">
-              {{ t('home.hello') }} <span class="text-primary">{{ profile.name }}</span>
-            </h1>
-            <h2 class="text-h6 text-sm-h5 text-md-h4 text-grey-darken-1 mb-6 text-break">
-              {{ profile.role }}
-            </h2>
-            <p class="text-body-1 mb-8">
-              {{ profile.bio }}
-            </p>
-            <div class="d-flex flex-column flex-sm-row justify-center justify-md-start ga-4">
-              <v-btn
-                color="primary"
-                size="large"
-                :to="localePath('/portfolio')"
-                prepend-icon="mdi-briefcase-outline"
-              >
-                {{ t('nav.portfolio') }}
-              </v-btn>
-              <v-btn
-                variant="outlined"
-                size="large"
-                :to="localePath('/experience')"
-                prepend-icon="mdi-briefcase-account-outline"
-              >
-                {{ t('nav.experience') }}
-              </v-btn>
-            </div>
-          </div>
-        </v-fade-transition>
-      </v-col>
-      
-      <v-col cols="12" md="6" class="text-center">
-        <v-scale-transition appear>
-          <v-avatar class="elevation-10" style="width: clamp(220px, 60vw, 300px); height: clamp(220px, 60vw, 300px);">
-            <img
-              :src="profile.avatar"
-              :alt="t('nav.home')"
-              loading="eager"
-              fetchpriority="high"
-              decoding="async"
-              style="width: 100%; height: 100%; object-fit: cover; display: block;"
+  <v-container class="editorial-shell home-page">
+    <section class="home-hero">
+      <div class="home-hero__content">
+        <RevealOnView>
+          <p class="editorial-kicker home-hero__role">
+            {{ profile.role }}
+          </p>
+        </RevealOnView>
+
+        <RevealOnView :delay="70">
+          <h1 class="editorial-display home-hero__title">
+            {{ t('home.hello') }}
+            <span class="home-hero__name">{{ profile.name }}</span>
+          </h1>
+        </RevealOnView>
+
+        <RevealOnView :delay="140">
+          <p class="editorial-lede home-hero__bio">
+            {{ profile.bio }}
+          </p>
+        </RevealOnView>
+
+        <RevealOnView :delay="210">
+          <div class="editorial-actions home-hero__actions">
+            <v-btn
+              color="primary"
+              size="large"
+              :to="localePath('/portfolio')"
+              append-icon="mdi-arrow-right"
             >
-          </v-avatar>
-        </v-scale-transition>
-      </v-col>
-    </v-row>
+              {{ t('nav.portfolio') }}
+            </v-btn>
+            <v-btn
+              variant="outlined"
+              size="large"
+              :to="localePath('/experience')"
+            >
+              {{ t('nav.experience') }}
+            </v-btn>
+          </div>
+        </RevealOnView>
+      </div>
+
+      <RevealOnView :delay="90" class="home-hero__portrait-reveal">
+        <figure class="home-hero__portrait">
+          <img
+            :src="profile.avatar"
+            :alt="profile.name"
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+          >
+        </figure>
+      </RevealOnView>
+    </section>
   </v-container>
 </template>
 
@@ -70,3 +74,103 @@ useHead({
   ]
 })
 </script>
+
+<style scoped>
+.home-page {
+  display: flex;
+  min-height: min(860px, calc(100svh - 72px));
+  align-items: center;
+}
+
+.home-hero {
+  display: grid;
+  width: 100%;
+  grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.75fr);
+  gap: clamp(36px, 7vw, 112px);
+  align-items: center;
+  padding-block: clamp(46px, 7vw, 92px);
+}
+
+.home-hero__content {
+  position: relative;
+  z-index: 1;
+}
+
+.home-hero .home-hero__role {
+  margin-bottom: clamp(28px, 4vw, 52px);
+}
+
+.home-hero__title {
+  position: relative;
+  z-index: 2;
+}
+
+.home-hero__name {
+  display: block;
+  color: var(--editorial-accent);
+}
+
+.home-hero .home-hero__bio {
+  margin-top: clamp(28px, 4vw, 48px);
+}
+
+.home-hero__actions {
+  margin-top: 34px;
+}
+
+.home-hero__portrait-reveal {
+  width: 100%;
+}
+
+.home-hero__portrait {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--editorial-line);
+  border-radius: var(--editorial-radius-large);
+  background: #e4e9ed;
+}
+
+.home-hero__portrait::after {
+  position: absolute;
+  inset: 14px;
+  border: 1px solid rgba(250, 251, 252, 0.58);
+  border-radius: calc(var(--editorial-radius-large) - 8px);
+  content: '';
+  pointer-events: none;
+}
+
+.home-hero__portrait img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (max-width: 959px) {
+  .home-page {
+    min-height: auto;
+  }
+
+  .home-hero {
+    grid-template-columns: minmax(0, 1.15fr) minmax(260px, 0.85fr);
+    gap: 36px;
+  }
+}
+
+@media (max-width: 719px) {
+  .home-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .home-hero__portrait-reveal {
+    width: min(100%, 480px);
+    justify-self: end;
+  }
+
+  .home-hero__portrait {
+    aspect-ratio: 5 / 6;
+  }
+}
+</style>

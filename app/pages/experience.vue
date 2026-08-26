@@ -1,8 +1,8 @@
 <template>
-  <v-container>
-    <h1 class="text-h3 font-weight-bold mb-8 text-center">{{ t('experience.heading') }}</h1>
+  <v-container class="editorial-shell editorial-page experience-page">
+    <PageIntro :title="t('experience.heading')" />
 
-    <v-alert v-if="shouldShowInlineBackendAlert" type="warning" variant="tonal" border="start" class="mb-6">
+    <v-alert v-if="shouldShowInlineBackendAlert" type="warning" variant="tonal" border="start" class="editorial-alert mb-8">
       <div class="d-flex align-center justify-space-between flex-wrap ga-3">
         <div>{{ t('errors.backendUnavailable') }}</div>
         <v-btn size="small" variant="outlined" :loading="pending" @click="refresh()">
@@ -11,81 +11,40 @@
       </div>
     </v-alert>
 
-    <v-row justify="center">
-      <v-col cols="12" md="10">
-        <div class="d-sm-none">
-          <div class="d-flex flex-column ga-4">
-            <v-card
-              v-for="(exp, index) in experiences"
-              :key="exp.id"
-              class="elevation-2 motion-lift motion-in"
-              :style="{ '--enter-delay': `${index * 40}ms` }"
-            >
-              <v-card-title class="experience-card-title">
-                <div class="text-caption text-primary mb-1">{{ exp.period }}</div>
-                <div class="text-h6 text-wrap text-break">{{ exp.role }}</div>
-                <div class="text-subtitle-1 text-grey-darken-1 text-wrap text-break">{{ exp.company }}</div>
-              </v-card-title>
-              <v-card-text>
-                <div class="mb-3 experience-description" v-html="exp.description" />
-                <div class="d-flex flex-wrap ga-2">
-                  <v-chip
-                    v-for="skill in exp.skills"
-                    :key="skill"
-                    size="small"
-                    color="secondary"
-                    variant="tonal"
-                  >
+    <ContentState
+      :pending="pending && experiences.length === 0"
+      :empty="!pending && experiences.length === 0"
+      :loading-text="t('states.loading')"
+      :empty-text="t('states.emptyExperience')"
+    >
+      <EditorialRecordList class="experience-list">
+        <article
+          v-for="(exp, index) in experiences"
+          :key="exp.id"
+          class="editorial-record experience-record"
+        >
+          <RevealOnView :delay="Math.min(index * 45, 180)">
+            <div class="experience-record__inner">
+              <div class="experience-record__period">
+                <span>{{ exp.period }}</span>
+              </div>
+
+              <div class="experience-record__body">
+                <h2>{{ exp.role }}</h2>
+                <p class="experience-record__company">{{ exp.company }}</p>
+                <!-- eslint-disable-next-line vue/no-v-html -->
+                <div class="editorial-rich-text experience-record__description" v-html="exp.description" />
+                <ul v-if="exp.skills.length" class="experience-record__skills">
+                  <li v-for="skill in exp.skills" :key="skill">
                     {{ skill }}
-                  </v-chip>
-                </div>
-              </v-card-text>
-            </v-card>
-          </div>
-        </div>
-
-        <div class="d-none d-sm-block">
-          <v-timeline align="start" side="end">
-            <v-timeline-item
-              v-for="(exp, index) in experiences"
-              :key="exp.id"
-              dot-color="primary"
-              size="small"
-              class="motion-in"
-              :style="{ '--enter-delay': `${index * 40}ms` }"
-            >
-              <template #opposite>
-                <div class="pt-1 headline font-weight-bold text-primary">
-                  {{ exp.period }}
-                </div>
-              </template>
-
-              <v-card class="elevation-2 motion-lift">
-                <v-card-title class="experience-card-title">
-                  <div class="text-h6 text-wrap text-break">{{ exp.role }}</div>
-                  <div class="text-subtitle-1 text-grey-darken-1 text-wrap text-break">{{ exp.company }}</div>
-                </v-card-title>
-                <v-card-text>
-                  <div class="mb-2 experience-description" v-html="exp.description" />
-                  <div class="mt-2">
-                    <v-chip
-                      v-for="skill in exp.skills"
-                      :key="skill"
-                      size="small"
-                      class="mr-2 mb-1"
-                      color="secondary"
-                      variant="tonal"
-                    >
-                      {{ skill }}
-                    </v-chip>
-                  </div>
-                </v-card-text>
-              </v-card>
-            </v-timeline-item>
-          </v-timeline>
-        </div>
-      </v-col>
-    </v-row>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </RevealOnView>
+        </article>
+      </EditorialRecordList>
+    </ContentState>
   </v-container>
 </template>
 
@@ -135,18 +94,94 @@ useHead(() => ({
 </script>
 
 <style scoped>
-.experience-card-title {
-  display: block;
-  white-space: normal;
+.experience-record {
+  padding-block: clamp(32px, 5vw, 64px);
 }
 
-.experience-description :deep(p) {
-  margin: 0 0 12px;
+.experience-record__inner {
+  display: grid;
+  grid-template-columns: minmax(170px, 0.31fr) minmax(0, 1fr);
+  gap: clamp(28px, 5vw, 72px);
 }
 
-.experience-description :deep(ul),
-.experience-description :deep(ol) {
-  margin: 0 0 12px;
-  padding-left: 1.25rem;
+.experience-record__period {
+  position: relative;
+  padding-top: 7px;
+  color: var(--editorial-accent);
+  font-size: 0.82rem;
+  font-variation-settings: 'wght' 680;
+  letter-spacing: -0.01em;
+}
+
+.experience-record__period::after {
+  position: absolute;
+  top: 11px;
+  right: clamp(-40px, calc(-2.5vw - 4px), -18px);
+  width: 9px;
+  height: 9px;
+  border: 2px solid var(--editorial-canvas);
+  border-radius: 50%;
+  background: var(--editorial-accent);
+  box-shadow: 0 0 0 1px var(--editorial-line-strong);
+  content: '';
+}
+
+.experience-record__body {
+  padding-left: clamp(28px, 4vw, 58px);
+  border-left: 1px solid var(--editorial-line-strong);
+}
+
+.experience-record__body h2 {
+  margin: 0;
+  font-size: clamp(1.55rem, 3vw, 3rem);
+  font-variation-settings: 'wght' 635;
+  letter-spacing: -0.045em;
+  line-height: 1.06;
+}
+
+.experience-record__company {
+  margin: 10px 0 0;
+  color: var(--editorial-muted);
+  font-size: 1rem;
+  font-weight: 550;
+}
+
+.experience-record__description {
+  max-width: 72ch;
+  margin-top: 28px;
+}
+
+.experience-record__skills {
+  display: flex;
+  padding: 0;
+  margin: 28px 0 0;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+}
+
+.experience-record__skills li {
+  padding: 6px 9px;
+  border: 1px solid var(--editorial-line);
+  border-radius: 8px;
+  color: var(--editorial-muted);
+  font-size: 0.78rem;
+  font-weight: 550;
+}
+
+@media (max-width: 699px) {
+  .experience-record__inner {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .experience-record__period::after {
+    display: none;
+  }
+
+  .experience-record__body {
+    padding-left: 0;
+    border-left: 0;
+  }
 }
 </style>
