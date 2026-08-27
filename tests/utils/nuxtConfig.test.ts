@@ -45,6 +45,26 @@ describe('nuxt.config favicon', () => {
     expect(nuxtConfig).toContain('innerHTML: criticalStyles')
   })
 
+  it('menjaga halaman berbasis backend tetap SSR agar data tidak dibekukan saat build', () => {
+    const nuxtConfig = readFileSync(resolve(process.cwd(), 'nuxt.config.ts'), 'utf8')
+
+    expect(nuxtConfig).toContain("'/experience': { prerender: false }")
+    expect(nuxtConfig).toContain("'/en/experience': { prerender: false }")
+    expect(nuxtConfig).not.toContain("'/portfolio/ecommerce-dashboard'")
+    expect(nuxtConfig).not.toContain("'/portfolio/task-management-app'")
+    expect(nuxtConfig).not.toContain("'/portfolio/portfolio-website'")
+    expect(nuxtConfig).not.toContain("'/portfolio/payments-api'")
+  })
+
+  it('menyamakan ukuran deskripsi About pada critical CSS dan style halaman', () => {
+    const criticalCss = readFileSync(resolve(process.cwd(), 'app/assets/styles/critical.css'), 'utf8')
+    const about = readFileSync(resolve(process.cwd(), 'app/pages/about.vue'), 'utf8')
+    const responsiveFontSize = 'font-size: clamp(1.15rem, 1.6vw, 1.6rem);'
+
+    expect(criticalCss).toContain(responsiveFontSize)
+    expect(about).toContain(responsiveFontSize)
+  })
+
   it('menyamakan metrik first paint dengan style setelah hydration', () => {
     const criticalCss = readFileSync(resolve(process.cwd(), 'app/assets/styles/critical.css'), 'utf8')
     const editorialCss = readFileSync(resolve(process.cwd(), 'app/assets/styles/editorial.css'), 'utf8')

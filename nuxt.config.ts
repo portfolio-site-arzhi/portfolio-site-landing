@@ -73,24 +73,17 @@ export default defineNuxtConfig({
       failHardOnBackendError: process.env.NUXT_PUBLIC_FAIL_HARD_ON_BACKEND_ERROR || ''
     }
   },
+  // Experience content comes from the runtime backend, which is unavailable while the Docker image is built.
+  routeRules: {
+    '/experience': { prerender: false },
+    '/en/experience': { prerender: false }
+  },
   modules: [
     ...(isTypecheckRun ? [] : ['@nuxt/eslint']),
     '@nuxt/test-utils/module',
     'vuetify-nuxt-module',
     '@nuxtjs/i18n'
   ],
-  nitro: {
-    prerender: {
-      failOnError: false,
-      routes: [
-        '/experience',
-        '/portfolio/ecommerce-dashboard',
-        '/portfolio/task-management-app',
-        '/portfolio/portfolio-website',
-        '/portfolio/payments-api'
-      ]
-    }
-  },
   vuetify: {
     moduleOptions: {},
     vuetifyOptions: {
