@@ -69,10 +69,10 @@ useHead(() => ({
 .about-narrative__copy p {
   max-width: 35ch;
   margin: 0;
-  font-size: clamp(1.65rem, 3.2vw, 3.25rem);
+  font-size: clamp(1.15rem, 1.6vw, 1.6rem);
   font-variation-settings: 'wght' 470;
-  letter-spacing: -0.045em;
-  line-height: 1.15;
+  letter-spacing: -0.025em;
+  line-height: 1.45;
 }
 
 .about-connect {
