@@ -16,14 +16,6 @@ const pageTransition = computed(() => resolvePageTransition(pageTransitionsReady
 const theme = useTheme()
 const runtimeConfig = useRuntimeConfig()
 
-// Prefetch landing lists on initial SSR and keep them alive across client navigations.
-// Portfolio detail stays route-level to avoid preloading every project payload globally.
-useLandingExperiences()
-useLandingEducations()
-useLandingCertifications()
-useLandingSkills()
-useLandingPortfolios()
-
 const { siteConfigs, hasBackendError } = await useSiteConfigsReady()
 const failHardOnBackendError = computed(() =>
   resolveFailHardOnBackendError(runtimeConfig.public.failHardOnBackendError, !import.meta.dev)

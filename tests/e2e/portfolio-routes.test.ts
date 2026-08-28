@@ -9,9 +9,15 @@ describe('portfolio detail routes', async () => {
     }
   })
 
-  it('prefetches portfolio list payload on non-portfolio routes', async () => {
+  it('keeps the SSR payload scoped to data used by the requested route', async () => {
     const html = await $fetch('/about')
-    expect(html).toContain('landing-portfolios')
+    expect(html).toContain('landing-skills')
+    expect(html).not.toContain('landing-portfolios')
+    expect(html).not.toContain('landing-experiences')
+
+    const experienceHtml = await $fetch('/experience')
+    expect(experienceHtml).toContain('landing-experiences')
+    expect(experienceHtml).not.toContain('landing-portfolios')
   })
 
   it.each([

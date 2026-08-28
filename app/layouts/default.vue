@@ -18,17 +18,17 @@
           </NuxtLink>
 
           <nav class="site-nav d-none d-lg-flex" :aria-label="t('a11y.primaryNavigation')">
-            <v-btn
+            <NuxtLink
               v-for="item in navigationItems"
               :key="item.path"
               :to="localePath(item.path)"
-              variant="text"
+              prefetch
               class="site-nav__link"
               :class="{ 'site-nav__link--active': isActive(item.path) }"
-              :active="isActive(item.path)"
+              :aria-current="isActive(item.path) ? 'page' : undefined"
             >
               {{ item.label }}
-            </v-btn>
+            </NuxtLink>
           </nav>
 
           <v-spacer />
@@ -70,16 +70,21 @@
             @click="drawer = false"
           />
         </div>
-        <v-list nav class="site-drawer__nav">
-          <v-list-item
+        <nav class="site-drawer__nav" :aria-label="t('a11y.primaryNavigation')">
+          <NuxtLink
             v-for="item in navigationItems"
             :key="item.path"
             :to="localePath(item.path)"
-            :title="item.label"
-            :prepend-icon="item.icon"
-            :active="isActive(item.path)"
-          />
-        </v-list>
+            prefetch
+            class="site-drawer__link"
+            :class="{ 'site-drawer__link--active': isActive(item.path) }"
+            :aria-current="isActive(item.path) ? 'page' : undefined"
+            @click="drawer = false"
+          >
+            <v-icon :icon="item.icon" size="21" aria-hidden="true" />
+            <span>{{ item.label }}</span>
+          </NuxtLink>
+        </nav>
       </v-navigation-drawer>
 
       <v-main id="main-content" class="site-main" tabindex="-1">
@@ -168,6 +173,7 @@ watch(
 
 <style scoped>
 .site-layout {
+  width: 100%;
   min-height: 100vh;
   flex-direction: column;
   overflow: visible !important;
@@ -196,13 +202,25 @@ watch(
 }
 
 .site-nav .site-nav__link {
+  display: inline-flex;
   position: relative;
   min-width: 0;
+  min-height: 36px;
   padding-inline: 10px;
+  border-radius: 10px;
+  align-items: center;
   color: var(--editorial-muted);
   font-size: 0.82rem;
+  justify-content: center;
   letter-spacing: 0.089em;
+  text-decoration: none;
   text-transform: uppercase;
+  transition: background-color 160ms ease, color 160ms ease;
+}
+
+.site-nav .site-nav__link:hover {
+  background: rgba(var(--v-theme-primary), 0.06);
+  color: var(--editorial-ink);
 }
 
 .site-nav .site-nav__link--active {
@@ -249,7 +267,28 @@ watch(
 }
 
 .site-drawer__nav {
+  display: grid;
   padding: 16px 12px;
+  gap: 4px;
+}
+
+.site-drawer__link {
+  display: grid;
+  min-height: 48px;
+  padding-inline: 16px;
+  border-radius: 8px;
+  align-items: center;
+  color: var(--editorial-muted);
+  column-gap: 16px;
+  grid-template-columns: 24px minmax(0, 1fr);
+  text-decoration: none;
+  transition: background-color 160ms ease, color 160ms ease;
+}
+
+.site-drawer__link:hover,
+.site-drawer__link--active {
+  background: rgba(var(--v-theme-primary), 0.08);
+  color: var(--editorial-ink);
 }
 
 .site-footer {
@@ -295,6 +334,13 @@ watch(
   .site-footer__inner {
     align-items: flex-start;
     flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-nav .site-nav__link,
+  .site-drawer__link {
+    transition: none;
   }
 }
 
