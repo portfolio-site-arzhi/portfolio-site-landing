@@ -73,6 +73,7 @@ img {
 }
 
 .site-layout {
+  width: 100%;
   min-height: 100vh;
   flex-direction: column;
   overflow: visible;
@@ -275,12 +276,18 @@ img {
 }
 
 .site-nav .site-nav__link {
+  display: inline-flex;
   position: relative;
   min-width: 0;
+  min-height: 36px;
   padding-inline: 10px;
+  border-radius: 10px;
+  align-items: center;
   color: var(--editorial-muted);
   font-size: 0.82rem;
+  justify-content: center;
   letter-spacing: 0.089em;
+  text-decoration: none;
   text-transform: uppercase;
 }
 
