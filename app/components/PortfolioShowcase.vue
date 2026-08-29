@@ -93,7 +93,10 @@
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import type { Project } from '../models/Project'
 import { applyPortfolioImageFallback, resolvePortfolioImage } from '../utils/portfolioImage'
-import { createPortfolioActivationCallbacks } from '../utils/portfolioShowcaseMotion'
+import {
+  createPortfolioActivationCallbacks,
+  resolvePortfolioActiveIndex
+} from '../utils/portfolioShowcaseMotion'
 
 const props = defineProps<{
   projects: Project[]
@@ -107,6 +110,7 @@ const props = defineProps<{
 const root = ref<HTMLElement | null>(null)
 let disposeMotion: (() => void) | undefined
 let isDisposed = false
+let syncFrame: number | undefined
 
 const projectPath = (slug: string) => `${props.basePath.replace(/\/$/, '')}/${slug}`
 
@@ -129,10 +133,19 @@ onMounted(async () => {
     const records = gsap.utils.toArray<HTMLElement>('.portfolio-showcase__record')
     let activeIndex = 0
 
-    gsap.set(visuals, { opacity: 0, scale: 0.965, zIndex: 0 })
-    if (visuals[0]) {
-      gsap.set(visuals[0], { opacity: 1, scale: 1, zIndex: 1 })
+    const setActiveVisualImmediately = (requestedIndex: number) => {
+      const nextIndex = Math.max(0, Math.min(requestedIndex, visuals.length - 1))
+      const activeVisual = visuals[nextIndex]
+
+      gsap.killTweensOf(visuals)
+      gsap.set(visuals, { opacity: 0, scale: 0.965, zIndex: 0 })
+      if (activeVisual) {
+        gsap.set(activeVisual, { opacity: 1, scale: 1, zIndex: 1 })
+      }
+      activeIndex = nextIndex
     }
+
+    setActiveVisualImmediately(0)
 
     const activate = (requestedIndex: number) => {
       const nextIndex = Math.max(0, Math.min(requestedIndex, visuals.length - 1))
@@ -183,10 +196,32 @@ onMounted(async () => {
         ...callbacks
       })
     })
+
+    const syncActiveVisual = () => {
+      const nextIndex = resolvePortfolioActiveIndex(
+        records.map(record => record.getBoundingClientRect().top),
+        window.innerHeight,
+        window.scrollY
+      )
+      setActiveVisualImmediately(nextIndex)
+    }
+
+    syncActiveVisual()
+    syncFrame = window.requestAnimationFrame(() => {
+      if (isDisposed) return
+      ScrollTrigger.refresh()
+      syncActiveVisual()
+    })
   }, root.value)
 
   root.value.dataset.motion = 'enhanced'
-  disposeMotion = () => context.revert()
+  disposeMotion = () => {
+    if (syncFrame !== undefined) {
+      window.cancelAnimationFrame(syncFrame)
+      syncFrame = undefined
+    }
+    context.revert()
+  }
 })
 
 onBeforeUnmount(() => {
