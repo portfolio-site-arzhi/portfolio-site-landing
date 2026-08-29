@@ -23,7 +23,7 @@
         :loading-text="t('states.loading')"
         :empty-text="t('states.emptyPortfolio')"
       >
-        <HydratedPortfolioShowcase
+        <PortfolioShowcase
           :projects="projects"
           :base-path="localePath('/portfolio')"
           :details-label="t('portfolio.details')"
@@ -37,13 +37,9 @@
 </template>
 
 <script setup lang="ts">
+import PortfolioShowcase from '../components/PortfolioShowcase.vue'
 import { useLandingPortfolios } from '../composables/useLandingPortfolios'
 import { resolveFailHardOnBackendError } from '../utils/backendFailure'
-
-const HydratedPortfolioShowcase = defineLazyHydrationComponent(
-  'visible',
-  () => import('../components/PortfolioShowcase.vue')
-)
 
 const { projects, hasBackendError, pending, refresh } = useLandingPortfolios()
 const route = useRoute()
