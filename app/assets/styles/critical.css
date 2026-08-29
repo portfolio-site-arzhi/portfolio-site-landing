@@ -750,35 +750,9 @@ img {
 }
 
 .portfolio-showcase {
-  display: grid;
-  grid-template-columns: minmax(0, 1.16fr) minmax(320px, 0.84fr);
-  gap: clamp(44px, 7vw, 112px);
-  align-items: start;
+  display: block;
 }
 
-.portfolio-showcase__media {
-  position: sticky;
-  top: calc(var(--app-bar-fallback) + 36px);
-  height: min(68svh, 680px);
-  overflow: hidden;
-  border-radius: var(--editorial-radius-large);
-  background: #e4e9ed;
-}
-
-.portfolio-showcase__visual {
-  position: absolute;
-  inset: 0;
-  margin: 0;
-  opacity: 0;
-  transform: scale(0.965);
-}
-
-.portfolio-showcase__visual--initial {
-  opacity: 1;
-  transform: scale(1);
-}
-
-.portfolio-showcase__visual img,
 .portfolio-showcase__inline-media img {
   display: block;
   width: 100%;
@@ -791,21 +765,26 @@ img {
 }
 
 .portfolio-showcase__record {
-  display: flex;
-  min-height: min(70svh, 680px);
-  padding-block: clamp(36px, 6vw, 72px);
+  display: grid;
+  padding-block: clamp(40px, 6vw, 76px);
   border-bottom: 1px solid var(--editorial-line);
-  flex-direction: column;
-  justify-content: center;
+  align-items: center;
+  gap: clamp(32px, 6vw, 88px);
+  grid-template-columns: minmax(280px, 0.92fr) minmax(0, 1.08fr);
 }
 
 .portfolio-showcase__inline-media {
-  display: none;
+  display: block;
   aspect-ratio: 4 / 3;
-  margin: 0 0 28px;
+  margin: 0;
   overflow: hidden;
   border-radius: var(--editorial-radius);
   background: #e4e9ed;
+}
+
+.portfolio-showcase__body {
+  min-width: 0;
+  max-width: 640px;
 }
 
 .portfolio-showcase__index {
@@ -1057,17 +1036,9 @@ img {
     display: block;
   }
 
-  .portfolio-showcase__media {
-    display: none;
-  }
-
   .portfolio-showcase__record {
-    min-height: auto;
-    justify-content: flex-start;
-  }
-
-  .portfolio-showcase__inline-media {
-    display: block;
+    gap: 28px;
+    grid-template-columns: 1fr;
   }
 }
 
@@ -1213,23 +1184,5 @@ img {
   .skills-group__inner {
     grid-template-columns: 1fr;
     gap: 18px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .portfolio-showcase {
-    display: block;
-  }
-
-  .portfolio-showcase__media {
-    display: none;
-  }
-
-  .portfolio-showcase__record {
-    min-height: auto;
-  }
-
-  .portfolio-showcase__inline-media {
-    display: block;
   }
 }
